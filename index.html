@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+    <head>
+        <meta charset="utf-8">
+<!--        Notice the order the libraries where included... i did these coz bootsrap depended on them so the must be called before loading the bootstrap-->
+        <meta name="viewport" content = "width= device-width, initial-scale= 1">
+        <script src="jquery-3.2.1.min.js">
+            
+        </script>
+        <script src="popper.min.js"></script>
+        
+        <script src="bootstrap-4.0.0-alpha.6-dist/js/bootstrap.min.js">
+        
+        </script>
+        <link rel="stylesheet" href="bootstrap-4.0.0-alpha.6-dist/css/bootstrap.min.css">
+        
+        
+        <style>
+            
+            
+            #btn{
+                
+                border-style: none;
+                border-radius: 5px;
+                color:white;
+                box-shadow: 0px 2px 6px skyblue;
+                position: absolute;
+                width:50px;
+                height: 50px;
+                padding: 12px;
+                
+                
+            }
+            
+            .btn{
+                
+                border-color:deeppink;
+                background-color: transparent;
+                color:white;
+                transition: 2s;
+                cursor: pointer;
+                margin-bottom: 8px;
+            }
+            .btn:hover{
+                
+                color:hotpink;
+            }
+            #result-pane{
+                
+                position: absolute;
+                width:400px;
+                height: 500px;
+                border-top-color: deeppink;
+                border-top-width: 13px;
+                border-top-style: solid;
+                border-top-left-radius: 10px;
+                border-top-right-radius: 10px;
+                z-index: 2000;
+                opacity: 0.9;
+                background-color: #0F0F0F;
+                padding: 10px;
+                left: 480px;
+                top:100px;
+                transition:3s;
+                
+            }
+            #content-display{
+                
+                position: absolute;
+                width: 95%;
+                height: 95%;
+                
+                border-width: 1px;
+                color:white;
+                background-color: transparent;
+            }
+            #c{
+                
+                border-style: solid;
+                border-color: white;
+                width:150px;
+                height: 150px;
+                padding: 10%;
+                border-width: 1px;
+                text-align: center;
+                border-radius: 50%;
+                font-size: 40px;
+                box-shadow: 0px 0px 8px deeppink;
+                margin-left: 30%;
+            }
+            hr{
+                
+                background-color: white;
+                opacity: 0.4;
+                width:186px;
+                margin-left: 23%;
+                margin-top:0px;
+                
+            }
+            #ok{
+                
+                border-style: solid;
+                border-width: 1px;
+                border-radius: 10px;
+                border-color:deeppink;
+                background-color: transparent;
+                color:white;
+                font-family: monospace;
+                width:50px;
+                cursor: pointer;
+                transition: 1s;
+                margin-top: 20%;
+                margin-left: 42%;
+            }
+            #ok:hover{
+                
+                background-color: black;
+            }
+            #welcome{
+                
+                border-top-color: skyblue;
+                border-top-left-radius: 20px;
+                border-top-right-radius: 20px;
+                border-top-style: solid ;
+                border-bottom-style: solid;
+                border-width: 2px;
+                border-bottom-color: deeppink;
+                border-bottom-right-radius: 20px;
+                border-bottom-left-radius: 20px;
+            }
+           
+        </style>
+    
+    </head>
+
+    <body style="background-color: black">
+        <div id="result-pane">
+            <div id="content-display">
+                
+                <div id="c">
+                
+                    <p id="score">70%</p>
+                </div>
+                <p style="text-align: center" class="mt-2">Score</p><br>
+                <p style="margin-left:23%;width:50%; text-align: center; color:white; border-top-style: solid; border-top-color: skyblue; border-top-width: 8px; border-top-left-radius: 5px; border-top-right-radius:5px"><small>STATISTICS</small></p>
+                <hr>
+                <p style="color:deeppink; text-align: center; "><small id="nom"></small></p>
+                <p style="color:deeppink; text-align: center; "><small id="nol"></small></p>
+                <p style="color:deeppink; text-align: center; "><small id="level">Level: Beginner</small></p>
+                
+                <button type="button" id="ok"> Ok </button>
+            </div>
+        </div>
+        <div id="btn">
+            <p style="text-align: center" id="key">KEY</p>
+        </div>
+        <div class="container" >
+            <div id="welcome">
+            
+                    <p class="display-4 " style="text-align: center; color: white"> Welcome to Key Matcher <br/>
+                    </p>
+                    <p  style="color:deeppink; text-align: center"><small>Let's see how well you can match those keys! </small></p>
+
+                    <div style="text-align: center">
+                        <button type="button" id="start" class="btn">Start !</button>
+                    </div>
+            
+            </div>
+            
+            
+        </div>
+        
+        
+        
+          <script>
+    
+        var btn = document.getElementById("btn");
+        //Custom event signaled to inform what letter was displayed
+        
+        document.getElementById("ok").addEventListener("click", ()=>{document.getElementById('result-pane').style.display="none"});
+        
+       
+        var speed = 1000;
+        var MIN_X = 250;
+        var MAX_X = 700;
+        var MIN_Y = 160;
+        var MAX_Y = 600;
+              
+        var numbCorrect = 0;
+        
+        var letterKeys = ["a","b","c", "d", "e", "f" ,"g", "h", "i", "j", "k", "l" ,"m", "n", "o", "p" ,"q" ,"r", "s" ,"t", "u", "v", "w" ,"x", "y", "z"]
+        
+        
+        var LEVELS = {
+            
+            beginner:{
+                name:"Beginner",
+                speed:2000,
+                runs: 20,
+            },
+            intermediate:{
+                name:"Intermediate",
+                speed:1000,
+                runs: 50
+            },
+            expert:{
+                name:"Expert",
+                speed:800,
+                runs:80
+                
+            },
+            master:{
+                name:"Master",
+                speed:300,
+                runs:110
+            }
+        }
+        
+        var gameSetup = {
+            
+            level: LEVELS.intermediate
+        }
+        
+        
+              
+        function init()
+        {
+            
+            btn.style.display="none";
+            document.getElementById("result-pane").style.display="none";
+            
+        }
+        
+        function bindStartEvent(callback,args){
+            
+            document.getElementById("start").addEventListener("click", function(){ callback(...args); resetScores();});
+            
+        }
+              
+              
+        function setKey(key){
+            
+           let keyNode =  document.getElementById("key");
+            keyNode.innerHTML = key.toUpperCase();
+           
+   
+        }
+        
+        
+        function display(locX, locY){
+            
+            btn.style.top = locY;
+            btn.style.left = locX;
+            btn.style.display = "";
+        }
+        
+        function fadeIn(){
+            
+            for(speed; speed>0; --speed){
+                
+                btn.style.opacity= toString(1/speed); 
+                
+            }
+            
+        }
+ 
+        function getRandomLoc()
+        {
+
+           
+            var cordinate = {};
+            cordinate.locX = Math.floor(Math.random() * (MAX_X - MIN_X + 1)) + MIN_X + "px";
+            cordinate.locY = Math.floor(Math.random() * (MAX_Y - MIN_Y + 1)) + MIN_Y + "px";
+      
+            return cordinate;
+        }
+        
+        function getRandomKeyIndex(){
+            
+            return Math.floor(Math.random() * (25 - 0 + 1)) + 0;
+        }
+        
+        function getLetter (){
+            
+            return letterKeys[getRandomKeyIndex()];
+        }
+        
+        function bindKeyBoardEvent(letter){
+            
+             onkeydown = (event) => {
+                    
+                    if(event.key === letter.toLowerCase()){
+                        
+                        document.getElementById("key").innerHTML= "OK!";
+                        btn.style.backgroundColor = "deeppink";
+                        ++numbCorrect;
+                    }
+                }
+        }
+              
+        function game(){
+            
+                var letter = getLetter();
+                setKey(letter);
+                
+                bindKeyBoardEvent(letter);
+                
+                var cordinate = getRandomLoc();
+                display(cordinate.locX, cordinate.locY);
+                fadeIn();  
+                resetBtnBgColor();
+        }
+              
+        
+        
+        function playGame (begin=1, duration){
+            
+                //I immediately schedule another play once the first ends
+                if(begin <= duration){
+                    game();
+                    ++begin;
+                    
+                    schedulePlay(begin, duration);
+                }
+                else{
+                    
+                    init();
+                    var result = computeResult(numbCorrect, gameSetup.level.runs);
+                    displayResult(result);
+                   
+                    
+                }
+                
+        }
+              
+        
+        // A recursive scheduler
+        function schedulePlay(begin=1,duration){
+            
+                
+            setTimeout(() =>{ playGame(begin,gameSetup.level.runs); },gameSetup.level.speed);
+                        
+          
+        }
+              
+        function resetBtnBgColor(){
+            
+            btn.style.backgroundColor="transparent";
+        }
+              
+              
+        function computeResult(numbCorrect, duration){
+            
+             return {
+                 
+                 numbCorrect: numbCorrect,
+                 totalKeys: duration,
+                 percentage: Math.round((numbCorrect / duration) * 100)
+             }
+            
+            
+        } 
+              
+       function resetScores(){
+           numbCorrect=0;
+           
+       }
+              
+        function displayResult(result){
+            
+            document.getElementById("nom").innerHTML= "Number of key match: " + result.numbCorrect;
+            document.getElementById("nol").innerHTML= "Number of keys: " + result.totalKeys;
+            document.getElementById("score").innerHTML= result.percentage + "%";
+            document.getElementById("result-pane").style.display="";
+        }
+              
+        //===============================================MAIN======================================================
+        
+        function main(){
+                        
+            init();  
+            bindStartEvent(schedulePlay,[1,gameSetup.level.runs]); 
+            
+            
+        }
+              
+        main();
+        
+    </script>
+    
+    </body>
+  
+
+</html>
+
+        
